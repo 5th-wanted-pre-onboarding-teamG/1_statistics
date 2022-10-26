@@ -1,11 +1,16 @@
-import {Controller, Post, UseGuards} from "@nestjs/common";
-import {AuthLocalGuard} from "./auth.guard";
-import {User} from "./auth.decorator";
+import {Controller, Get, Post, Req, UseGuards} from "@nestjs/common";
+import {AuthenticatedGuard, AuthLocalGuard} from "./auth.guard";
 
 @Controller('auth')
 export class AuthController {
 
     @UseGuards(AuthLocalGuard)
     @Post('login')
-    async login(@User() user) {}
+    async login() {}
+
+    @UseGuards(AuthenticatedGuard)
+    @Get('logout')
+    async logout(@Req() req) {
+        req.session.destroy();
+    }
 }

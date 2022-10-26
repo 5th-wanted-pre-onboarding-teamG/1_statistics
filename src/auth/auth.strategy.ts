@@ -3,7 +3,7 @@ import {PassportStrategy} from "@nestjs/passport";
 import {Strategy} from 'passport-local';
 import {Repository} from "typeorm";
 import {Users} from "../entities/Users";
-import bcrypt from 'bcrypt';
+import {bcrypt} from 'bcrypt';
 import {InjectRepository} from "@nestjs/typeorm";
 
 @Injectable()
