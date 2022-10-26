@@ -13,6 +13,12 @@ export class Users {
   @PrimaryGeneratedColumn({ type: 'int', name: 'userId' })
   userId: number;
 
+  @Column({ type: 'varchar', name: 'email', length: 12 })
+  email: string;
+
+  @Column({ type: 'text', name: 'password' })
+  password: string;
+
   @Column({ type: 'varchar', name: 'name', length: 12 })
   name: string;
 
