@@ -1,3 +1,4 @@
+import { Gender } from 'src/entities/enums/gender';
 import { UserRank } from 'src/entities/enums/userRank';
 
 export class CreateUserDto {
@@ -5,7 +6,7 @@ export class CreateUserDto {
   password: string;
   name: string;
   rank?: UserRank;
-  gender: '남성' | '여성';
+  gender: Gender;
   age: string;
   phone: string;
 }
