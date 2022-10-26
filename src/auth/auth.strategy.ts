@@ -3,12 +3,13 @@ import {PassportStrategy} from "@nestjs/passport";
 import {Strategy} from 'passport-local';
 import {Repository} from "typeorm";
 import {Users} from "../entities/Users";
+import bcrypt from 'bcrypt';
 import {InjectRepository} from "@nestjs/typeorm";
 
 @Injectable()
 export class AuthStrategy extends PassportStrategy(Strategy) {
     constructor(@InjectRepository(Users) private readonly userRepository: Repository<Users>) {
-        super();
+        super({ usernameField: 'email', passwordField: 'password' });
     }
 
     async validate(email: string, pass: string): Promise<any> {
