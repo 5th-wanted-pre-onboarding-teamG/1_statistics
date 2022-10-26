@@ -16,6 +16,9 @@ export class Users {
   @Column({ type: 'varchar', name: 'name', length: 12 })
   name: string;
 
+  @Column({ type: 'varchar', name: 'password', length: 20 })
+  password: string;
+
   @Column({
     type: 'enum',
     name: 'class',
