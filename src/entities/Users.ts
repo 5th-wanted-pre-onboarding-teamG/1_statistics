@@ -1,6 +1,7 @@
 import {
   Column,
   CreateDateColumn,
+  DeleteDateColumn,
   Entity,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -46,11 +47,14 @@ export class Users {
   memberSince: Date;
 
   @Column({
-    type: 'datetime',
+    type: 'timestamp',
     name: 'lastAccess',
     default: () => 'CURRENT_TIMESTAMP',
   })
   lastAccess: Date;
+
+  @DeleteDateColumn()
+  deletedAt: Date | null;
 
   @OneToMany(() => Boards, (boards) => boards.Author)
   Boards: Boards[];
