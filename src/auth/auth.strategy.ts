@@ -20,7 +20,7 @@ export class AuthStrategy extends PassportStrategy(Strategy) {
             throw new NotFoundException('해당 사용자 정보를 찾을 수 없습니다.')
         }
 
-        const validate = await bcrypt.compare(pass, findUser.password, 12);
+        const validate = await bcrypt.compare(pass, findUser.password);
 
         if (!validate) {
             throw new UnauthorizedException('아이디 또는 비밀번호가 올바르지 않습니다.')
