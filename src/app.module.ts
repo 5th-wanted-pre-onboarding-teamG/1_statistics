@@ -1,12 +1,15 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { LoggerMiddleware } from './common/middlewares/logger.middleware';
+import { Boards } from './entities/Boards';
+import { Users } from './entities/Users';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => {
@@ -18,8 +21,9 @@ import { LoggerMiddleware } from './common/middlewares/logger.middleware';
           password: configService.get('DB_PASSWORD'),
           database: configService.get('DB_DATABASE'),
           migrations: [__dirname + '/src/migrations/*.ts'],
+          entities: [Users, Boards],
           autoLoadEntities: true,
-          synchronize: false,
+          synchronize: true,
           logging: true,
           keepConnectionAlive: true,
         };
