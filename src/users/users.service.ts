@@ -19,13 +19,9 @@ export class UsersService {
     }
     const hashedPassword = await bcrypt.hash(body.password, 12);
     const result = await this.usersRepsitory.save({
-      email: body.email,
+      ...body,
       password: hashedPassword,
-      name: body.name,
-      rank: body.rank,
-      gender: body.gender,
       age: +body.age,
-      phone: body.phone,
     });
     return result;
   }
