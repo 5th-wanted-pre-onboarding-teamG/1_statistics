@@ -13,7 +13,7 @@ export class Users {
   @PrimaryGeneratedColumn({ type: 'int', name: 'userId' })
   userId: number;
 
-  @Column({ type: 'varchar', name: 'email', length: 12 })
+  @Column({ type: 'varchar', name: 'email', length: 30 })
   email: string;
 
   @Column({ type: 'text', name: 'password' })
@@ -45,7 +45,11 @@ export class Users {
   @CreateDateColumn({ name: 'memberSince' })
   memberSince: Date;
 
-  @Column({ type: 'datetime', name: 'lastAccess' })
+  @Column({
+    type: 'datetime',
+    name: 'lastAccess',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
   lastAccess: Date;
 
   @OneToMany(() => Boards, (boards) => boards.Author)
