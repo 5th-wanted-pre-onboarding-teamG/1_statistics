@@ -17,8 +17,8 @@ import { AuthModule } from './auth/auth.module';
       useFactory: async (configService: ConfigService) => {
         return {
           type: 'mysql',
-          host: 'localhost',
           port: 3306,
+          host: configService.get('DB_HOST'),
           username: configService.get('DB_USERNAME'),
           password: configService.get('DB_PASSWORD'),
           database: configService.get('DB_DATABASE'),
