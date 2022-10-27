@@ -8,6 +8,7 @@ import { Boards } from './entities/Boards';
 import { Users } from './entities/Users';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
+import { BoardsModule } from './boards/boards.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { AuthModule } from './auth/auth.module';
       },
     }),
     UsersModule,
+    BoardsModule,
     AuthModule,
   ],
   controllers: [AppController],
