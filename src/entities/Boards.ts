@@ -1,5 +1,5 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { BoardType } from './enums/boardType';
+import { BoardKind } from './enums/boardKind';
 import { Users } from './Users';
 
 @Entity({ schema: 'preonboarding', name: 'boards' })
@@ -7,8 +7,8 @@ export class Boards {
   @PrimaryGeneratedColumn({ type: 'int', name: 'boardId' })
   boardId: number;
 
-  @Column({ type: 'enum', name: 'type', enum: ['자유', '공지', '운영'] })
-  type: BoardType;
+  @Column({ type: 'enum', name: 'type', enum: BoardKind })
+  kind: BoardKind;
 
   @Column({ type: 'varchar', name: 'title', length: 50 })
   title: string;

@@ -6,6 +6,7 @@ import { AppService } from './app.service';
 import { LoggerMiddleware } from './common/middlewares/logger.middleware';
 import { Boards } from './entities/Boards';
 import { Users } from './entities/Users';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { Users } from './entities/Users';
         };
       },
     }),
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
