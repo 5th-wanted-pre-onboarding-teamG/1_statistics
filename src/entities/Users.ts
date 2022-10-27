@@ -26,7 +26,7 @@ export class Users {
 
   @Column({
     type: 'enum',
-    name: 'class',
+    name: 'rank',
     enum: UserRank,
     default: '일반',
   })

@@ -7,7 +7,7 @@ export class Boards {
   @PrimaryGeneratedColumn({ type: 'int', name: 'boardId' })
   boardId: number;
 
-  @Column({ type: 'enum', name: 'type', enum: BoardKind })
+  @Column({ type: 'enum', name: 'kind', enum: BoardKind })
   kind: BoardKind;
 
   @Column({ type: 'varchar', name: 'title', length: 50 })
