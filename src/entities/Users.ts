@@ -7,7 +7,8 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Boards } from './Boards';
-import { UserClass } from './enums/userClass';
+import { Gender } from './enums/gender';
+import { UserRank } from './enums/userRank';
 
 @Entity({ schema: 'preonboarding', name: 'users' })
 export class Users {
@@ -26,13 +27,13 @@ export class Users {
   @Column({
     type: 'enum',
     name: 'class',
-    enum: UserClass,
+    enum: UserRank,
     default: '일반',
   })
-  class: UserClass;
+  rank: UserRank;
 
-  @Column({ type: 'enum', name: 'gender', enum: ['남성', '여성'] })
-  gender: '남성' | '여성';
+  @Column({ type: 'enum', name: 'gender', enum: Gender })
+  gender: Gender;
 
   @Column({ type: 'tinyint', name: 'age', unsigned: true })
   age: number;
