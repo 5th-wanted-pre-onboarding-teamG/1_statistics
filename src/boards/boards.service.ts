@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Boards } from 'src/entities/Boards';
+import { BoardKind } from 'src/entities/enums/boardKind';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -10,6 +11,18 @@ export class BoardsService {
     @InjectRepository(Boards)
     private readonly boardsRepository: Repository<Boards>,
   ) {}
+
+  /**
+   * 종류에 따라 게시물을 조회합니다.
+   * @param kind 게시물 종류
+   * @returns 종류에 맞는 게시물을 객체 배열로 반환합니다.
+   */
+  async getBoardsByKind(kind: BoardKind) {
+    console.log(kind);
+    return await this.boardsRepository.find({
+      where: { kind },
+    });
+  }
 
   /**
    * 게시물 아이디로 특정 게시물을 조회합니다.

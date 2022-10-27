@@ -1,9 +1,20 @@
-import { Controller, Get, Param, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Param, ParseIntPipe, Query } from '@nestjs/common';
+import { BoardKind } from 'src/entities/enums/boardKind';
 import { BoardsService } from './boards.service';
 
 @Controller('boards')
 export class BoardsController {
   constructor(private readonly boardsService: BoardsService) {}
+
+  /**
+   * 종류에 따라 게시물을 조회합니다.
+   * @param kind 게시물 종류
+   * @returns 종류에 맞는 게시물을 객체 배열로 반환합니다.
+   */
+  @Get('search')
+  getBoardsByKind(@Query('kind') kind: BoardKind) {
+    return this.boardsService.getBoardsByKind(kind);
+  }
 
   /**
    * 게시물 아이디로 특정 게시물을 조회합니다.
