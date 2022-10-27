@@ -5,12 +5,14 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  UseGuards,
 } from '@nestjs/common';
 import { User } from 'src/auth/auth.decorator';
 import { BoardKind } from 'src/entities/enums/boardKind';
 import { Users } from 'src/entities/Users';
 import { BoardService } from './boards.service';
 import { CreateBoardDto } from './dto/create-board.dto';
+import { AuthenticatedGuard } from '../auth/auth.guard';
 
 @Controller('boards')
 export class BoardController {
@@ -31,6 +33,7 @@ export class BoardController {
    * @param user 세션에 저장된 유저 정보
    * @description 게시글 소프트 삭제
    */
+  @UseGuards(AuthenticatedGuard)
   @Delete(':boardId')
   async deleteBoard(
     @Param('boardId', ParseIntPipe) boardId: number,
