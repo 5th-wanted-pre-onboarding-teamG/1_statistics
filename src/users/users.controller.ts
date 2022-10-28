@@ -21,8 +21,8 @@ export class UsersController {
    * @returns 유저생성 결과
    */
   @Post()
-  userSignup(@Body() body: CreateUserDto) {
-    return this.usersService.userSignup(body);
+  signUp(@Body() body: CreateUserDto) {
+    return this.usersService.signUp(body);
   }
 
   /**
@@ -32,7 +32,7 @@ export class UsersController {
    * @returns 삭제된 결과 반환
    */
   @Delete(':userId')
-  removeUserById(@Param('userId', ParseIntPipe) userId: number) {
-    return this.usersService.removeUserById(userId);
+  deleteUserById(@Param('userId', ParseIntPipe) userId: number) {
+    return this.usersService.deleteUserById(userId);
   }
 }

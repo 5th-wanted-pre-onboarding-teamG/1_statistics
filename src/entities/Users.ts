@@ -9,6 +9,7 @@ import {
 import { Boards } from './Boards';
 import { Gender } from './enums/gender';
 import { UserRank } from './enums/userRank';
+import { Histories } from './Histories';
 
 @Entity({ schema: 'preonboarding', name: 'users' })
 export class Users {
@@ -56,4 +57,7 @@ export class Users {
 
   @OneToMany(() => Boards, (boards) => boards.Author)
   Boards: Boards[];
+
+  @OneToMany(() => Histories, (histories) => histories.Connector)
+  Histories: Histories[];
 }
