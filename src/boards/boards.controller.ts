@@ -43,27 +43,22 @@ export class BoardsController {
     return this.boardsService.getSpecificBoard(boardId);
   }
 
+  /**
+   * @url POST '/boards/:kind'
+   * @param kind 게시물의 종류를 정합니다.
+   * @Body createBoardDto: 게시물 생성시 필요한 정보 입니다.{제목, 내용}
+   * @User user:현재 로그인 된 유저를 나타냅니다.
+   * @description 유저가 게시판을 생성합니다. rank별로 만들 수 있는 게시판이 다릅니다.
+   * @returns 게시판 생성
+   */
+
+  @UseGuards(AuthenticatedGuard)
   @Post(':kind')
   async createBoard(
     @Param('kind') kind: BoardKind,
-    @Body() boardRequest: CreateBoardDto,
+    @Body() createBoardDto: CreateBoardDto,
     @User() user: Users,
   ) {
-    return await this.boardsService.createBoard(boardRequest, kind, user);
-  }
-
-  /**
-   * @url DELETE '/boards/:boardId'
-   * @param boardId 게시글 아이디
-   * @param user 세션에 저장된 유저 정보
-   * @description 게시글 소프트 삭제
-   */
-  @UseGuards(AuthenticatedGuard)
-  @Delete(':boardId')
-  async deleteBoard(
-    @Param('boardId', ParseIntPipe) boardId: number,
-    @User() user: Users,
-  ): Promise<void> {
-    await this.boardsService.deleteBoard(boardId, user);
+    return await this.boardsService.createBoard(createBoardDto, kind, user);
   }
 }
