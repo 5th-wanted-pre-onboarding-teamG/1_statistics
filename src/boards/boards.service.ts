@@ -75,10 +75,12 @@ export class BoardsService {
    */
   async deleteBoard(boardId: number, user: Users): Promise<DeleteResult> {
     // 게시글 아이디와 유저 정보가 일치하는 게시글이 있는지 확인
-    const existsBoard = await this.boardsRepository.findOneBy({
-      boardId,
-      Author: user,
-    });
+    const existsBoard = await this.boardsRepository
+      .createQueryBuilder('boards')
+      .leftJoin('boards.Author', 'users')
+      .where('boards.boardId = :boardId', { boardId })
+      .andWhere('users.userId = :userId', { userId: user.userId })
+      .getOne();
 
     // 게시글이 없거나 작성자가 일치하지 않을 시 에러 처리
     if (!existsBoard) {
