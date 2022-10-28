@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Boards } from '../entities/Boards';
-import { DeleteResult, Repository } from 'typeorm';
+import { Brackets, DataSource, DeleteResult, Repository } from 'typeorm';
 import { CreateBoardDto } from './dto/create-board.dto';
 import { BoardKind } from 'src/entities/enums/boardKind';
 import { Users } from 'src/entities/Users';
@@ -15,34 +15,48 @@ import { UserRank } from 'src/entities/enums/userRank';
 export class BoardsService {
   // 게시물 레포지터리를 주입합니다.
   constructor(
+    private dataSource: DataSource,
     @InjectRepository(Boards)
     private readonly boardsRepository: Repository<Boards>,
   ) {}
 
-  /**
-   * 종류에 따라 게시물을 조회합니다.
-   * @param kind 게시물 종류
-   * @returns 종류에 맞는 게시물을 객체 배열로 반환합니다.
-   */
-  async getBoardsByKind(kind: BoardKind) {
-    return await this.boardsRepository
-      .createQueryBuilder('boards')
-      .where('boards.kind = :kind', { kind })
-      .orderBy('boards.createdAt', 'DESC')
-      .getManyAndCount();
-  }
+  async searchBoards(
+    page: number,
+    kind?: BoardKind,
+    name?: string,
+    keyword?: string,
+  ) {
+    const queryBuilder = this.dataSource
+      .createQueryBuilder()
+      .select('boards')
+      .from(Boards, 'boards')
+      .leftJoinAndSelect('boards.Author', 'author')
+      .where('1 = 1')
+      .take(30)
+      .skip(30 * (page - 1))
+      .orderBy('boards.createdAt', 'DESC');
 
-  /**
-   * 게시물 아이디로 특정 게시물을 조회합니다.
-   * @api GET /boards/:boardId
-   * @param boardId 게시물 아이디
-   * @returns 특정 게시물 아이디의 게시물 한 개를 반환합니다.
-   */
-  async getSpecificBoard(boardId: number) {
-    // 게시물의 아이디는 고유한 값이므로 findOne을 사용했습니다.
-    return await this.boardsRepository.findOne({
-      where: { boardId },
-    });
+    if (kind) {
+      console.log('kind', kind);
+      queryBuilder.andWhere('boards.kind = :kind', { kind });
+    }
+    if (name) {
+      console.log('name', name);
+      queryBuilder.andWhere('author.name = :name', { name });
+    }
+    if (keyword) {
+      console.log('keyword', keyword);
+      queryBuilder.andWhere(
+        new Brackets((qb) => {
+          qb.where('boards.title like :keyword', { keyword: `%${keyword}%` }),
+            qb.orWhere('boards.content like :keyword', {
+              keyword: `%${keyword}%`,
+            });
+        }),
+      );
+    }
+    const data = await queryBuilder.getMany();
+    return data;
   }
 
   /**
@@ -57,19 +71,6 @@ export class BoardsService {
       .innerJoin('boards.Author', 'author', 'author.userId = :userId', {
         userId,
       })
-      .orderBy('boards.createdAt', 'DESC')
-      .getManyAndCount();
-  }
-
-  /**
-   * 특정 작성자가 만든 게시물을 모두 조회합니다.
-   * @param name 작성자 이름
-   * @returns 특정 작성자가 만든 모든 게시물을 최신순으로 객체 배열로 반환합니다.
-   */
-  async getBoardsByUsername(name: string) {
-    return await this.boardsRepository
-      .createQueryBuilder('boards')
-      .innerJoin('boards.Author', 'author', 'author.name = :name', { name })
       .orderBy('boards.createdAt', 'DESC')
       .getManyAndCount();
   }

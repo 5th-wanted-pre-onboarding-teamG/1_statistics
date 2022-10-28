@@ -21,26 +21,27 @@ export class BoardsController {
   constructor(private readonly boardsService: BoardsService) {}
 
   /**
-   * 종류에 따라 게시물을 조회합니다.
-   * @api GET /boards?kind=종류
-   * @query kind 게시물 종류 { '자유' | '운영' | '공지' }
-   * @returns 종류에 맞는 게시물을 객체 배열로 반환합니다.
+   * 게시물 종류, 작성자 이름, 키워드(제목 혹은 내용)에 따라서 게시물을 검색하여 조회합니다.
+   * @api GET /board?query=value[&query=value]
+   * @query query { kind: 게시물 종류, name: 작성자 이름, keyword: 제목 및 내용 검색에 쓰일 단어}
+   * @returns 각각의 용도에 따라 알맞게 게시물을 최신순으로 정렬하여 반환합니다.
    */
   @Get()
-  getBoardsByKind(@Query('kind') kind: BoardKind) {
-    return this.boardsService.getBoardsByKind(kind);
-  }
-
-  /**
-   * 게시물 아이디로 특정 게시물을 조회합니다.
-   * @api GET /boards/search/:boardId
-   * @param boardId 게시물 아이디
-   * @returns 특정 게시물 아이디의 게시물 한 개를 반환합니다.
-   */
-  @Get('search/:boardId')
-  // ParseIntPipe로 string으로 들어오는 param값을 number로 바꿉니다.
-  getSpecificBoard(@Param('boardId', ParseIntPipe) boardId: number) {
-    return this.boardsService.getSpecificBoard(boardId);
+  searchBoards(
+    @Query()
+    query: {
+      page: number;
+      kind?: BoardKind;
+      name?: string;
+      keyword?: string;
+    },
+  ) {
+    return this.boardsService.searchBoards(
+      query.page,
+      query.kind,
+      query.name,
+      query.keyword,
+    );
   }
 
   /**
@@ -52,17 +53,6 @@ export class BoardsController {
   @Get('myBoards')
   getAllMyBoards(@User() user: Users) {
     return this.boardsService.getAllMyBoards(user.userId);
-  }
-
-  /**
-   * 특정 작성자가 만든 게시물을 모두 조회합니다.
-   * @api GET /boards/search/:name/boards
-   * @param name 작성자 이름
-   * @returns 특정 작성자가 만든 모든 게시물을 최신순으로 객체 배열로 반환합니다.
-   */
-  @Get('search/:name/boards')
-  getBoardsByUsername(@Param('name') name: string) {
-    return this.boardsService.getBoardsByUsername(name);
   }
 
   /**
