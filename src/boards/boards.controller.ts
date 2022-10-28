@@ -93,7 +93,7 @@ export class BoardsController {
     @Param('boardId', ParseIntPipe) boardId: number,
     @User() user: Users,
     @Body() updateBoardDto?: UpdateBoardDto,
-  ): Promise<void> {
-    await this.boardsService.updateBoard(boardId, updateBoardDto, user);
+  ) {
+    return await this.boardsService.updateBoard(boardId, updateBoardDto, user);
   }
 }
