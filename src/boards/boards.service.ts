@@ -115,35 +115,10 @@ export class BoardsService {
       throw new NotFoundException('해당 게시글은 존재하지 않습니다.');
     }
 
-    // 요청 유저의 랭크에서 쓰기접근이 가능한 게시글 종류
-    const availableBoardKind = this.getAvailableWriteBoardByUserRank(user.rank);
-
-    // 수정 게시글 종류
-    const targetBoardKind = targetBoard.kind;
-    if (!availableBoardKind.includes(targetBoardKind)) {
-      throw new BadRequestException('해당 게시글을 수정권한이 없습니다.');
-    }
-
     // 수정
     this.boardsRepository.save({
       ...updateBoardDto,
       boardId,
     });
-  }
-
-  // 수정요청자 랭크(UserRank)에 따라 쓰기 접근이 가능한 게시글종류를 리턴
-  private getAvailableWriteBoardByUserRank(userRank: string) {
-    switch (userRank) {
-      // '일반' : '자유' 게시판 작성권한을 갖습니다.
-      case UserRank.NORMAL:
-        return [BoardKind.FREE];
-
-      // '운영자', '관리자' : '자유','공지','운영' 게시판  작성권한을 갖습니다.
-      case (UserRank.MANAGER, UserRank.ADMIN):
-        return [BoardKind.FREE, BoardKind.NOTICE, BoardKind.OPER];
-
-      default:
-        throw new BadRequestException('존재하지 않은 회원타입 입니다.');
-    }
   }
 }
