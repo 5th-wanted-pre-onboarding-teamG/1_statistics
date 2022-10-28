@@ -19,7 +19,7 @@ export class UsersService {
    * @param body 회원가입에 필요한 정보 { 이메일, 비밀번호, 이름, 랭크, 성별, 나이, 전화번호 }
    * @returns 유저 회원가입 결과
    */
-  async userSignup(body: CreateUserDto) {
+  async signUp(body: CreateUserDto) {
     // 데이터베이스를 조회하여 이미 존재하는 유저인지 검사합니다.
     const row = await this.findByEmail(body.email);
 
@@ -45,7 +45,7 @@ export class UsersService {
    * @param userId 유저 아이디
    * @returns 삭제 결과
    */
-  async removeUserById(userId: number) {
+  async deleteUserById(userId: number) {
     const result = await this.usersRepsitory.softDelete({
       userId,
     });
