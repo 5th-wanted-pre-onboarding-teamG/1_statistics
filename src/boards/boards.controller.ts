@@ -5,6 +5,7 @@ import {
   Get,
   Param,
   ParseIntPipe,
+  Patch,
   Post,
   Query,
   UseGuards,
@@ -15,6 +16,7 @@ import { Users } from 'src/entities/Users';
 import { BoardsService } from './boards.service';
 import { CreateBoardDto } from './dto/create-board.dto';
 import { AuthenticatedGuard } from '../auth/auth.guard';
+import { UpdateBoardDto } from './dto/update-board.dto';
 
 @Controller('boards')
 export class BoardsController {
@@ -74,5 +76,24 @@ export class BoardsController {
     @User() user: Users,
   ): Promise<void> {
     await this.boardsService.deleteBoard(boardId, user);
+  }
+
+  /**
+   * @url PATCH '/boards/:boardId'
+   * @param boardId 게시글아이디
+   * @param user 세션에 저장된 유저정보
+   * @description 게시글 수정 (타이틀, 내용)
+   * - 일반유저: 자유게시판 본인작성만
+   * - 관리자: 자유&운영게시판 본인작성)
+   * - 수정을 하려다가 취소하는 경우를 고려하여 '?'를 붙였습니다.
+   */
+  @UseGuards(AuthenticatedGuard)
+  @Patch(':boardId')
+  async updateBoard(
+    @Param('boardId', ParseIntPipe) boardId: number,
+    @User() user: Users,
+    @Body() updateBoardDto?: UpdateBoardDto,
+  ): Promise<void> {
+    await this.boardsService.updateBoard(boardId, updateBoardDto, user);
   }
 }

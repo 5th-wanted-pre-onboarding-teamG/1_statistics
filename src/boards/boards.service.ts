@@ -2,6 +2,7 @@ import {
   Injectable,
   NotFoundException,
   ForbiddenException,
+  BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Boards } from '../entities/Boards';
@@ -10,6 +11,7 @@ import { CreateBoardDto } from './dto/create-board.dto';
 import { BoardKind } from 'src/entities/enums/boardKind';
 import { Users } from 'src/entities/Users';
 import { UserRank } from 'src/entities/enums/userRank';
+import { UpdateBoardDto } from './dto/update-board.dto';
 
 @Injectable()
 export class BoardsService {
@@ -17,6 +19,8 @@ export class BoardsService {
   constructor(
     @InjectRepository(Boards)
     private readonly boardsRepository: Repository<Boards>,
+    @InjectRepository(Users)
+    private readonly usersRepository: Repository<Users>,
   ) {}
 
   /**
@@ -89,5 +93,65 @@ export class BoardsService {
 
     // 게시글 삭제
     return this.boardsRepository.softDelete(boardId);
+  }
+
+  /**
+   * @param boardId 게시글 아이디
+   * @param user 수정요청 유저
+   * @returns 수정결과
+   */
+  async updateBoard(
+    boardId: number,
+    updateBoardDto: UpdateBoardDto,
+    user: Users,
+  ) {
+    // 수정요청 유저가 게시글 작성자인지 확인
+    const targetBoard = await this.boardsRepository.findOneBy({
+      boardId,
+      Author: user,
+    });
+
+    if (!targetBoard) {
+      throw new NotFoundException('해당 게시글을 찾을 수 없습니다.');
+    }
+
+    // 요청 유저랭크
+    const requestUserInfo = await this.usersRepository.findOneBy({
+      userId: user.userId,
+    });
+
+    const userRank = requestUserInfo.rank;
+    const targetBoardKind = targetBoard.kind;
+
+    // 요청 유저의 랭크에서 쓰기접근이 가능한 게시글 종류
+    const availableBoardKind = this.getAvailableWriteBoardByUserRank(userRank);
+
+    if (!availableBoardKind.length) {
+      throw new BadRequestException('회원등급이 존재하지 않습니다.');
+    }
+
+    if (!availableBoardKind.includes(targetBoardKind)) {
+      throw new BadRequestException('해당 게시글을 수정권한이 없습니다.');
+    }
+
+    // 수정
+    this.boardsRepository.save({
+      ...updateBoardDto,
+      boardId,
+    });
+  }
+
+  // 수정요청자 랭크(UserRank)에 따라 쓰기 접근이 가능한 게시글종류를 리턴
+  private getAvailableWriteBoardByUserRank(userRank: string) {
+    switch (userRank) {
+      case UserRank.NORMAL:
+        return [BoardKind.FREE];
+
+      case (UserRank.MANAGER, UserRank.ADMIN):
+        return [BoardKind.FREE, BoardKind.NOTICE, BoardKind.OPER];
+
+      default:
+        return [];
+    }
   }
 }
