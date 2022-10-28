@@ -32,7 +32,7 @@ export class BoardsController {
 
   /**
    * 게시물 아이디로 특정 게시물을 조회합니다.
-   * @api GET /boards/:boardId
+   * @api GET /boards/search/:boardId
    * @param boardId 게시물 아이디
    * @returns 특정 게시물 아이디의 게시물 한 개를 반환합니다.
    */
@@ -55,6 +55,7 @@ export class BoardsController {
 
   /**
    * 특정 작성자가 만든 게시물을 모두 조회합니다.
+   * @api GET /boards/search/:name/boards
    * @param name 작성자 이름
    * @returns 특정 작성자가 만든 모든 게시물을 최신순으로 객체 배열로 반환합니다.
    */
