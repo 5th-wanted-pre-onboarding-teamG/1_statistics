@@ -25,10 +25,11 @@ export class BoardsService {
    * @returns 종류에 맞는 게시물을 객체 배열로 반환합니다.
    */
   async getBoardsByKind(kind: BoardKind) {
-    console.log(kind);
-    return await this.boardsRepository.find({
-      where: { kind },
-    });
+    return await this.boardsRepository
+      .createQueryBuilder('boards')
+      .where('boards.kind = :kind', { kind })
+      .orderBy('boards.createdAt', 'DESC')
+      .getManyAndCount();
   }
 
   /**
