@@ -1,5 +1,4 @@
 import { IsNotEmpty, IsString } from 'class-validator';
-import { BoardKind } from 'src/entities/enums/boardKind';
 
 export class CreateBoardDto {
   @IsNotEmpty()
