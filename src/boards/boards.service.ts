@@ -7,24 +7,49 @@ import { BoardKind } from 'src/entities/enums/boardKind';
 import { Users } from 'src/entities/Users';
 
 @Injectable()
-export class BoardService {
+export class BoardsService {
+  // 게시물 레포지터리를 주입합니다.
   constructor(
     @InjectRepository(Boards)
-    private boardRepository: Repository<Boards>,
+    private readonly boardsRepository: Repository<Boards>,
   ) {}
+
+  /**
+   * 종류에 따라 게시물을 조회합니다.
+   * @param kind 게시물 종류
+   * @returns 종류에 맞는 게시물을 객체 배열로 반환합니다.
+   */
+  async getBoardsByKind(kind: BoardKind) {
+    console.log(kind);
+    return await this.boardsRepository.find({
+      where: { kind },
+    });
+  }
+
+  /**
+   * 게시물 아이디로 특정 게시물을 조회합니다.
+   * @api GET /boards/:boardId
+   * @param boardId 게시물 아이디
+   * @returns 특정 게시물 아이디의 게시물 한 개를 반환합니다.
+   */
+  async getSpecificBoard(boardId: number) {
+    // 게시물의 아이디는 고유한 값이므로 findOne을 사용했습니다.
+    return await this.boardsRepository.findOne({
+      where: { boardId },
+    });
+  }
   async createBoard(
     boardRequest: CreateBoardDto,
     kind: BoardKind,
     user: Users,
   ) {
-    const result = [];
-    const board = await this.boardRepository.create({
+    const board = await this.boardsRepository.create({
       title: boardRequest.title,
       content: boardRequest.content,
       kind,
       Author: user,
     });
-    return this.boardRepository.save(board);
+    return this.boardsRepository.save(board);
   }
 
   /**
@@ -35,7 +60,7 @@ export class BoardService {
    */
   async deleteBoard(boardId: number, user: Users): Promise<DeleteResult> {
     // 게시글 아이디와 유저 정보가 일치하는 게시글이 있는지 확인
-    const existsBoard = await this.boardRepository.findOneBy({
+    const existsBoard = await this.boardsRepository.findOneBy({
       boardId,
       Author: user,
     });
@@ -46,6 +71,6 @@ export class BoardService {
     }
 
     // 게시글 삭제
-    return this.boardRepository.softDelete(boardId);
+    return this.boardsRepository.softDelete(boardId);
   }
 }
