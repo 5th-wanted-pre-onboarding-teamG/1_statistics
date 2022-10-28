@@ -9,6 +9,8 @@ import { Boards } from './entities/Boards';
 import { Users } from './entities/Users';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
+import { Histories } from './entities/Histories';
+import { HistoriesModule } from './histories/histories.module';
 
 @Module({
   imports: [
@@ -24,7 +26,7 @@ import { AuthModule } from './auth/auth.module';
           password: configService.get('DB_PASSWORD'),
           database: configService.get('DB_DATABASE'),
           migrations: [__dirname + '/src/migrations/*.ts'],
-          entities: [Users, Boards],
+          entities: [Users, Boards, Histories],
           autoLoadEntities: true,
           synchronize: true,
           logging: true,
@@ -34,6 +36,7 @@ import { AuthModule } from './auth/auth.module';
     }),
     UsersModule,
     BoardsModule,
+    HistoriesModule,
     AuthModule,
   ],
   controllers: [AppController],
