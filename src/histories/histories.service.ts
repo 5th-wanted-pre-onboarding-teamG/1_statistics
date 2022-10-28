@@ -53,7 +53,7 @@ export class HistoriesService {
       .leftJoin('histories.Connector', 'users')
       .select([
         `DATE_FORMAT(histories.connectTime, '%Y-%m-%d') AS connectDate`,
-        'users.age',
+        'users.age AS age',
         'COUNT(*) AS ageCount',
       ])
       .where(
