@@ -105,15 +105,16 @@ export class BoardsService {
     updateBoardDto: UpdateBoardDto,
     user: Users,
   ) {
-    const targetBoard = await this.boardsRepository.findOneBy({ boardId });
+    // boardId에 해당하는 게시글이 로그인유저가 작성한 글인지 확인
+    const targetBoard = await this.boardsRepository
+      .createQueryBuilder('boards')
+      .leftJoin('boards.Author', 'users')
+      .where('boards.boardId = :boardId', { boardId })
+      .andWhere('users.userId = :userId', { userId: user.userId })
+      .getOne();
 
     if (!targetBoard) {
-      throw new NotFoundException('해당 게시글을 찾을 수 없습니다.');
-    }
-
-    //작성자와 요청자가 동일한지 확인
-    if (user.userId !== targetBoard.Author.userId) {
-      throw new ForbiddenException('해당 게시글의 수정권한이 없습니다.');
+      throw new NotFoundException('해당 게시글은 존재하지 않습니다.');
     }
 
     // 요청 유저의 랭크에서 쓰기접근이 가능한 게시글 종류
