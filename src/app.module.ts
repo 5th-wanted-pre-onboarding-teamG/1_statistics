@@ -10,6 +10,7 @@ import { Users } from './entities/Users';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { Histories } from './entities/Histories';
+import { HistoriesModule } from './histories/histories.module';
 
 @Module({
   imports: [
@@ -35,7 +36,7 @@ import { Histories } from './entities/Histories';
     }),
     BoardModule,
     UsersModule,
-    Histories,
+    HistoriesModule,
     AuthModule,
   ],
   controllers: [AppController],
