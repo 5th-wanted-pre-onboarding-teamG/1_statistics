@@ -16,6 +16,13 @@ export class Boards {
   @Column({ type: 'text', name: 'content' })
   content: string;
 
+  @Column({
+    type: 'timestamp',
+    name: 'createdAt',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  createdAt: Date;
+
   @ManyToOne(() => Users, (users) => users.Boards)
   Author: Users;
 }
