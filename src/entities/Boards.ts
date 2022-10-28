@@ -1,4 +1,10 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  DeleteDateColumn,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { BoardKind } from './enums/boardKind';
 import { Users } from './Users';
 
@@ -15,6 +21,9 @@ export class Boards {
 
   @Column({ type: 'text', name: 'content' })
   content: string;
+
+  @DeleteDateColumn()
+  deletedAt: Date | null;
 
   @ManyToOne(() => Users, (users) => users.Boards)
   Author: Users;
