@@ -37,7 +37,7 @@ export class BoardsController {
    * @param boardId 게시물 아이디
    * @returns 특정 게시물 아이디의 게시물 한 개를 반환합니다.
    */
-  @Get('search/:boardId')
+  @Get(':boardId')
   // ParseIntPipe로 string으로 들어오는 param값을 number로 바꿉니다.
   getSpecificBoard(@Param('boardId', ParseIntPipe) boardId: number) {
     return this.boardsService.getSpecificBoard(boardId);
