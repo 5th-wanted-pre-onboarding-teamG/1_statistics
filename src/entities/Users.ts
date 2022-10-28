@@ -29,7 +29,7 @@ export class Users {
     type: 'enum',
     name: 'rank',
     enum: UserRank,
-    default: '일반',
+    default: UserRank.NORMAL,
   })
   rank: UserRank;
 
