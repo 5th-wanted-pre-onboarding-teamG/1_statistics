@@ -32,10 +32,12 @@ export class BoardsService {
       .getManyAndCount();
   }
 
-  async getBoardsByUsername(name: string) {
+  async getAllMyBoards(userId: number) {
     return await this.boardsRepository
       .createQueryBuilder('boards')
-      .innerJoin('boards.Author', 'author', 'author.name = :name', { name })
+      .innerJoin('boards.Author', 'author', 'author.userId = :userId', {
+        userId,
+      })
       .orderBy('boards.createdAt', 'DESC')
       .getManyAndCount();
   }
