@@ -105,31 +105,22 @@ export class BoardsService {
     updateBoardDto: UpdateBoardDto,
     user: Users,
   ) {
-    // 수정요청 유저가 게시글 작성자인지 확인
-    const targetBoard = await this.boardsRepository.findOneBy({
-      boardId,
-      Author: user,
-    });
+    const targetBoard = await this.boardsRepository.findOneBy({ boardId });
 
     if (!targetBoard) {
       throw new NotFoundException('해당 게시글을 찾을 수 없습니다.');
     }
 
-    // 요청 유저랭크
-    const requestUserInfo = await this.usersRepository.findOneBy({
-      userId: user.userId,
-    });
-
-    const userRank = requestUserInfo.rank;
-    const targetBoardKind = targetBoard.kind;
-
-    // 요청 유저의 랭크에서 쓰기접근이 가능한 게시글 종류
-    const availableBoardKind = this.getAvailableWriteBoardByUserRank(userRank);
-
-    if (!availableBoardKind.length) {
-      throw new BadRequestException('회원등급이 존재하지 않습니다.');
+    //작성자와 요청자가 동일한지 확인
+    if (user.userId !== targetBoard.Author.userId) {
+      throw new ForbiddenException('해당 게시글의 수정권한이 없습니다.');
     }
 
+    // 요청 유저의 랭크에서 쓰기접근이 가능한 게시글 종류
+    const availableBoardKind = this.getAvailableWriteBoardByUserRank(user.rank);
+
+    // 수정 게시글 종류
+    const targetBoardKind = targetBoard.kind;
     if (!availableBoardKind.includes(targetBoardKind)) {
       throw new BadRequestException('해당 게시글을 수정권한이 없습니다.');
     }
@@ -144,14 +135,16 @@ export class BoardsService {
   // 수정요청자 랭크(UserRank)에 따라 쓰기 접근이 가능한 게시글종류를 리턴
   private getAvailableWriteBoardByUserRank(userRank: string) {
     switch (userRank) {
+      // '일반' : '자유' 게시판 작성권한을 갖습니다.
       case UserRank.NORMAL:
         return [BoardKind.FREE];
 
+      // '운영자', '관리자' : '자유','공지','운영' 게시판  작성권한을 갖습니다.
       case (UserRank.MANAGER, UserRank.ADMIN):
         return [BoardKind.FREE, BoardKind.NOTICE, BoardKind.OPER];
 
       default:
-        return [];
+        throw new BadRequestException('존재하지 않은 회원타입 입니다.');
     }
   }
 }

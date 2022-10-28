@@ -9,5 +9,4 @@ export class UpdateBoardDto {
   @IsNotEmpty()
   @IsString()
   content: string;
-  kind: BoardKind;
 }
