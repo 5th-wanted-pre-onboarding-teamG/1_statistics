@@ -52,6 +52,15 @@ export class BoardsService {
       where: { boardId },
     });
   }
+
+  async getBoardsByUsername(name: string) {
+    return await this.boardsRepository
+      .createQueryBuilder('boards')
+      .innerJoin('boards.Author', 'author', 'author.name = :name', { name })
+      .orderBy('boards.createdAt', 'DESC')
+      .getManyAndCount();
+  }
+
   async createBoard(
     createBoardDto: CreateBoardDto,
     kind: BoardKind,
