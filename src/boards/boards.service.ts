@@ -1,7 +1,7 @@
 import {
-  ForbiddenException,
   Injectable,
   NotFoundException,
+  ForbiddenException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Boards } from '../entities/Boards';
@@ -48,20 +48,23 @@ export class BoardsService {
     kind: BoardKind,
     user: Users,
   ) {
-    // 유저의 rank가 NORMAL일 경우 운영 및 공지 게시판의 접근을 할 수 없습니다.
-    if (!Boards.isCreateAuthority(user.rank, kind)) {
-      throw new ForbiddenException(`${kind} 게시판의 권한이 없습니다.`);
+    const board = new Boards();
+    // 유저의 rank가 NORMAL일 경우 공지 게시판의 접근을 할 수 없습니다.
+    if (user.rank === UserRank.NORMAL && kind === BoardKind.NOTICE) {
+      throw new ForbiddenException('공지 게시판의 권한이 없습니다.');
     }
-
-    const { title, content } = createBoardDto;
+    // 유저의 rank가 NORMAL일 경우 공지 게시판의 접근을 할 수 없습니다.
+    if (user.rank === UserRank.NORMAL && kind === BoardKind.OPER) {
+      throw new ForbiddenException('운영 게시판의 권한이 없습니다.');
+    }
+    board.title = createBoardDto.title;
+    board.content = createBoardDto.content;
+    board.Author = user;
+    board.kind = createBoardDto.kind;
 
     //게시글 저장
-    return await this.boardsRepository.save({
-      title,
-      content,
-      kind,
-      user,
-    });
+    const saveBoard = await this.boardsRepository.save(board);
+    return saveBoard;
   }
 
   /**
