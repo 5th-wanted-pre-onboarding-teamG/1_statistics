@@ -42,11 +42,22 @@ export class BoardsController {
     return this.boardsService.getSpecificBoard(boardId);
   }
 
+  /**
+   * 현재 사용자가 작성한 모든 게시물을 조회합니다.
+   * @api GET /boards/myBoards
+   * @param user 요청객체에 담긴 유저 정보
+   * @returns 내가 작성한 모든 게시물을 최신순으로 객체 배열로 반환합니다.
+   */
   @Get('myBoards')
   getAllMyBoards(@User() user: Users) {
     return this.boardsService.getAllMyBoards(user.userId);
   }
 
+  /**
+   * 특정 작성자가 만든 게시물을 모두 조회합니다.
+   * @param name 작성자 이름
+   * @returns 특정 작성자가 만든 모든 게시물을 최신순으로 객체 배열로 반환합니다.
+   */
   @Get('search/:name/boards')
   getBoardsByUsername(@Param('name') name: string) {
     return this.boardsService.getBoardsByUsername(name);
