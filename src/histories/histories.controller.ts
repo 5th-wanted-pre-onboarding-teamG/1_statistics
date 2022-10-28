@@ -21,4 +21,13 @@ export class HistoriesController {
       searchHistoryByTimeDto,
     );
   }
+
+  /**
+   * @url GET '/histories/age
+   * @returns 금일 방문한 유저 나이기준으로 통계를 나타냅니다.
+   */
+  @Get('age')
+  async getNowDateStatisticsFromUserAges() {
+    return await this.historiesService.getNowDateStatisticsFromUserAges();
+  }
 }
