@@ -4,6 +4,7 @@ import { Users } from 'src/entities/Users';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
+import { UserRank } from 'src/entities/enums/userRank';
 
 @Injectable()
 export class UsersService {
@@ -61,5 +62,20 @@ export class UsersService {
     return this.usersRepsitory.findOne({
       where: { email },
     });
+  }
+
+  /**
+   * 유저의 성별을 통계합니다.
+   * 유저의 성별은 유저 rank가 NORMAL유저만 통계합니다
+   * @returns NORMAL유저의 성별의 수를 보여 줍니다.
+   */
+  async getHistoriesByGender() {
+    return await this.usersRepsitory
+      .createQueryBuilder('users')
+      .select('users.gender AS gender')
+      .addSelect('COUNT(*) ')
+      .where('users.rank =:rank', { rank: UserRank.NORMAL })
+      .groupBy('gender')
+      .getRawMany();
   }
 }
