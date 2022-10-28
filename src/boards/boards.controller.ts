@@ -42,6 +42,11 @@ export class BoardsController {
     return this.boardsService.getSpecificBoard(boardId);
   }
 
+  @Get('myBoards')
+  getAllMyBoards(@User() user: Users) {
+    return this.boardsService.getAllMyBoards(user.userId);
+  }
+
   @Get('search/:name/boards')
   getBoardsByUsername(@Param('name') name: string) {
     return this.boardsService.getBoardsByUsername(name);

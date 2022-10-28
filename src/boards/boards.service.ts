@@ -32,16 +32,6 @@ export class BoardsService {
       .getManyAndCount();
   }
 
-  async getAllMyBoards(userId: number) {
-    return await this.boardsRepository
-      .createQueryBuilder('boards')
-      .innerJoin('boards.Author', 'author', 'author.userId = :userId', {
-        userId,
-      })
-      .orderBy('boards.createdAt', 'DESC')
-      .getManyAndCount();
-  }
-
   /**
    * 게시물 아이디로 특정 게시물을 조회합니다.
    * @api GET /boards/:boardId
@@ -53,6 +43,16 @@ export class BoardsService {
     return await this.boardsRepository.findOne({
       where: { boardId },
     });
+  }
+
+  async getAllMyBoards(userId: number) {
+    return await this.boardsRepository
+      .createQueryBuilder('boards')
+      .innerJoin('boards.Author', 'author', 'author.userId = :userId', {
+        userId,
+      })
+      .orderBy('boards.createdAt', 'DESC')
+      .getManyAndCount();
   }
 
   async getBoardsByUsername(name: string) {
