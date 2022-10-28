@@ -1,7 +1,6 @@
 import {
   Body,
   Controller,
-  Delete,
   Get,
   Param,
   ParseIntPipe,
@@ -22,11 +21,11 @@ export class BoardsController {
 
   /**
    * 종류에 따라 게시물을 조회합니다.
-   * @api GET /boards/search?kind=kind
+   * @api GET /boards?kind=종류
    * @query kind 게시물 종류 { '자유' | '운영' | '공지' }
    * @returns 종류에 맞는 게시물을 객체 배열로 반환합니다.
    */
-  @Get('search')
+  @Get()
   getBoardsByKind(@Query('kind') kind: BoardKind) {
     return this.boardsService.getBoardsByKind(kind);
   }
