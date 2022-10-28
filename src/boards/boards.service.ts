@@ -2,7 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Boards } from 'src/entities/Boards';
 import { BoardKind } from 'src/entities/enums/boardKind';
+import { Users } from 'src/entities/Users';
 import { Repository } from 'typeorm';
+import { CreateBoardDto } from './dto/create-board.dto';
 
 @Injectable()
 export class BoardsService {
@@ -35,5 +37,18 @@ export class BoardsService {
     return await this.boardsRepository.findOne({
       where: { boardId },
     });
+  }
+  async createBoard(
+    boardRequest: CreateBoardDto,
+    kind: BoardKind,
+    user: Users,
+  ) {
+    const board = await this.boardsRepository.create({
+      title: boardRequest.title,
+      content: boardRequest.content,
+      kind,
+      Author: user,
+    });
+    return this.boardsRepository.save(board);
   }
 }

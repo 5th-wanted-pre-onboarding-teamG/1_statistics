@@ -1,6 +1,17 @@
-import { Controller, Get, Param, ParseIntPipe, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Post,
+  Query,
+} from '@nestjs/common';
+import { User } from 'src/auth/auth.decorator';
 import { BoardKind } from 'src/entities/enums/boardKind';
+import { Users } from 'src/entities/Users';
 import { BoardsService } from './boards.service';
+import { CreateBoardDto } from './dto/create-board.dto';
 
 @Controller('boards')
 export class BoardsController {
@@ -27,5 +38,14 @@ export class BoardsController {
   // ParseIntPipe로 string으로 들어오는 param값을 number로 바꿉니다.
   getSpecificBoard(@Param('boardId', ParseIntPipe) boardId: number) {
     return this.boardsService.getSpecificBoard(boardId);
+  }
+
+  @Post(':kind')
+  async createBoard(
+    @Param('kind') kind: BoardKind,
+    @Body() boardRequest: CreateBoardDto,
+    @User() user: Users,
+  ) {
+    return await this.boardsService.createBoard(boardRequest, kind, user);
   }
 }
