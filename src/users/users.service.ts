@@ -12,7 +12,7 @@ export class UsersService {
     // 유저 레포지터리 주입
     private datasource: DataSource,
     @InjectRepository(Users)
-    private readonly usersRepsitory: Repository<Users>,
+    private readonly usersRepository: Repository<Users>,
   ) {}
 
   /**
@@ -25,10 +25,10 @@ export class UsersService {
     await queryRunner.connect();
     await queryRunner.startTransaction();
     // 데이터베이스를 조회하여 이미 존재하는 유저인지 검사합니다.
-    const row = await this.findByEmail(body.email);
+    const exists = await this.findByEmail(body.email);
 
     // 이미 가입된 회원이라면 회원가입하면 안되므로 예외를 발생시킵니다.
-    if (row) {
+    if (exists) {
       throw new BadRequestException('이미 가입된 회원입니다.');
     }
 
@@ -36,7 +36,7 @@ export class UsersService {
     const hashedPassword = await bcrypt.hash(body.password, 12);
     try {
       // 데이터베이스에 저장합니다.
-      const result = await this.usersRepsitory.save({
+      const result = await this.usersRepository.save({
         ...body,
         password: hashedPassword,
         age: +body.age,
@@ -57,10 +57,9 @@ export class UsersService {
    * @returns 삭제 결과
    */
   async deleteUserById(userId: number) {
-    const result = await this.usersRepsitory.softDelete({
+    return this.usersRepository.softDelete({
       userId,
     });
-    return result;
   }
 
   /**
@@ -69,7 +68,7 @@ export class UsersService {
    * @returns 유저 이메일 탐색 결과
    */
   async findByEmail(email: string) {
-    return this.usersRepsitory.findOne({
+    return this.usersRepository.findOne({
       where: { email },
     });
   }
