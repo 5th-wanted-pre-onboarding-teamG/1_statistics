@@ -32,6 +32,14 @@ export class BoardsService {
       .getManyAndCount();
   }
 
+  async getBoardsByUsername(name: string) {
+    return await this.boardsRepository
+      .createQueryBuilder('boards')
+      .innerJoin('boards.Author', 'author', 'author.name = :name', { name })
+      .orderBy('boards.createdAt', 'DESC')
+      .getManyAndCount();
+  }
+
   /**
    * 게시물 아이디로 특정 게시물을 조회합니다.
    * @api GET /boards/:boardId

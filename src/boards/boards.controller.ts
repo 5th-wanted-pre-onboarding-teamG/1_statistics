@@ -39,8 +39,13 @@ export class BoardsController {
    */
   @Get('search/:boardId')
   // ParseIntPipe로 string으로 들어오는 param값을 number로 바꿉니다.
-  getSpecificBoard(@Param('boardId', ParseIntPipe) boardId: number) {
+  getSpecificBoard(@Query('boardId', ParseIntPipe) boardId: number) {
     return this.boardsService.getSpecificBoard(boardId);
+  }
+
+  @Get('search/:name/boards')
+  getBoardsByUsername(@Param('name') name: string) {
+    return this.boardsService.getBoardsByUsername(name);
   }
 
   /**
