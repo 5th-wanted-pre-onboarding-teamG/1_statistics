@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Users } from 'src/entities/Users';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import * as bcrypt from 'bcrypt';
 
@@ -10,6 +10,7 @@ export class UsersService {
   // 의존성 주입
   constructor(
     // 유저 레포지터리 주입
+    private datasource: DataSource,
     @InjectRepository(Users)
     private readonly usersRepsitory: Repository<Users>,
   ) {}
@@ -20,6 +21,9 @@ export class UsersService {
    * @returns 유저 회원가입 결과
    */
   async signUp(body: CreateUserDto) {
+    const queryRunner = this.datasource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
     // 데이터베이스를 조회하여 이미 존재하는 유저인지 검사합니다.
     const row = await this.findByEmail(body.email);
 
@@ -30,14 +34,21 @@ export class UsersService {
 
     // 데이터베이스에 바로 저장하지 않고 암호화해서 저장합니다.
     const hashedPassword = await bcrypt.hash(body.password, 12);
-
-    // 데이터베이스에 저장합니다.
-    const result = await this.usersRepsitory.save({
-      ...body,
-      password: hashedPassword,
-      age: +body.age,
-    });
-    return result;
+    try {
+      // 데이터베이스에 저장합니다.
+      const result = await this.usersRepsitory.save({
+        ...body,
+        password: hashedPassword,
+        age: +body.age,
+      });
+      await queryRunner.commitTransaction();
+      return true;
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
   }
 
   /**
