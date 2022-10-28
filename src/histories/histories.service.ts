@@ -51,13 +51,16 @@ export class HistoriesService {
     const ageRecords = await this.historiesRepository
       .createQueryBuilder('histories')
       .leftJoin('histories.Connector', 'users')
-      .select("DATE_FORMAT(histories.connectTime, '%Y-%m-%d') AS connectDate")
-      .addSelect('users.age')
-      .addSelect('COUNT(*) AS ageCount')
+      .select([
+        `DATE_FORMAT(histories.connectTime, '%Y-%m-%d') AS connectDate`,
+        'users.age',
+        'COUNT(*) AS ageCount',
+      ])
       .where(
-        "DATE_FORMAT(histories.connectTime, '%Y-%m-%d') = DATE_FORMAT(now())",
+        `DATE_FORMAT(histories.connectTime, '%Y-%m-%d') = DATE_FORMAT(now(), '%Y-%m-%d')`,
       )
-      .groupBy("age, DATE_FORMAT(histories.connectTime, '%Y-%m-%d')")
+      .groupBy('users.age')
+      .addGroupBy("DATE_FORMAT(histories.connectTime, '%Y-%m-%d')")
       .getRawMany();
 
     const resultRecords = await Promise.all(
