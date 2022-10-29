@@ -36,4 +36,13 @@ export class UsersController {
   deleteUserById(@Param('userId', ParseIntPipe) userId: number) {
     return this.usersService.deleteUserById(userId);
   }
+
+  /**
+   * @url Get '/users/gender'
+   * @returns NORMAL유저의 성별의 수를 반환합니다.
+   */
+  @Get('gender')
+  async getHistoriesByGender() {
+    return await this.usersService.getHistoriesByGender();
+  }
 }
