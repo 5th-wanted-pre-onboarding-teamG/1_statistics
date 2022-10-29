@@ -16,13 +16,13 @@ export class UsersController {
 
   /**
    * @url POST '/users'
-   * @param body 회원가입에 필요한 정보 { 이메일, 비밀번호, 이름, 랭크, 성별, 나이, 전화번호 }
+   * @param createUserDto 회원가입에 필요한 정보 { 이메일, 비밀번호, 이름, 랭크, 성별, 나이, 전화번호 }
    * @description 유저 회원가입 기능입니다.
    * @returns 유저생성 결과
    */
   @Post()
-  signUp(@Body() body: CreateUserDto) {
-    return this.usersService.signUp(body);
+  signUp(@Body() createUserDto: CreateUserDto) {
+    return this.usersService.signUp(createUserDto);
   }
 
   /**
