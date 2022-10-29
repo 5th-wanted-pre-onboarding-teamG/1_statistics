@@ -93,24 +93,18 @@ export class BoardsService {
    * @param rank 유저 등급
    * @param page 페이지 번호
    * @param pageSize 페이지 단위
-   * @description 유저의 등급을 통해 게시판을 조회하고, 페이징합니다.
-   * @returns 유저 게시판 조회 결과
+   * @description 전체 게시판을 조회하고, 페이징합니다.
+   * @returns 공지사항을 포함한 전체 게시판 게시글(최신순)
    */
   async getAllBoards(rank: UserRank, page?: number, pageSize?: number) {
     let kind;
     const skip = page * pageSize;
 
-    // 일반등급의 유저는 운영게시판에 대한 조회를 제외합니다.
-    if (rank === UserRank.NORMAL) {
-      kind = Not(BoardKind.OPER);
-    }
-
-    const board = await this.boardsRepository.find({
-      where: { kind },
-      skip: skip,
-      take: pageSize,
-      order: { createdAt: 'DESC' },
-    });
+    const board = await this.boardsRepository
+      .createQueryBuilder('boards')
+      .where('kind != :kind', { kind: BoardKind.NOTICE })
+      .orderBy('createdAt', 'DESC')
+      .getMany();
 
     return board;
   }

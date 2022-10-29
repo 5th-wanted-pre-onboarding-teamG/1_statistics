@@ -65,8 +65,8 @@ export class BoardsController {
   /*
    * @url GET '/boards'
    * @param page 조회할 페이지 번호
-   * @description 유저 등급에 따라 전체 게시판을 조회하는 기능입니다.
-   * @returns 게시판 조회 결과
+   * @description 전체 게시판을 조회하는 기능입니다.
+   * @returns 공지사항을 포함한 전체 게시판 게시글(최신순)
    */
   @UseGuards(AuthenticatedGuard)
   @Get('')
