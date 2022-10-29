@@ -20,43 +20,32 @@ export class BoardsService {
     private readonly boardsRepository: Repository<Boards>,
   ) {}
 
-  async searchBoards(
-    page: number,
-    kind?: BoardKind,
-    name?: string,
-    keyword?: string,
-  ) {
+  async searchBoards(page = 1, kind?: BoardKind, name = '', keyword = '') {
+    const take = 30;
+
     const queryBuilder = this.dataSource
       .createQueryBuilder()
       .select('boards')
       .from(Boards, 'boards')
       .leftJoinAndSelect('boards.Author', 'author')
-      .where('1 = 1')
-      .take(30)
-      .skip(30 * (page - 1))
-      .orderBy('boards.createdAt', 'DESC');
-
-    if (kind) {
-      console.log('kind', kind);
-      queryBuilder.andWhere('boards.kind = :kind', { kind });
-    }
-    if (name) {
-      console.log('name', name);
-      queryBuilder.andWhere('author.name = :name', { name });
-    }
-    if (keyword) {
-      console.log('keyword', keyword);
-      queryBuilder.andWhere(
+      .where('author.name LIKE :name', { name: `%${name}%` })
+      .andWhere(
         new Brackets((qb) => {
           qb.where('boards.title like :keyword', { keyword: `%${keyword}%` }),
             qb.orWhere('boards.content like :keyword', {
               keyword: `%${keyword}%`,
             });
         }),
-      );
+      )
+      .take(take)
+      .skip(take * (page - 1))
+      .orderBy('boards.createdAt', 'DESC');
+
+    if (kind) {
+      queryBuilder.andWhere('boards.kind = :kind', { kind });
     }
-    const data = await queryBuilder.getMany();
-    return data;
+
+    return await queryBuilder.getMany();
   }
 
   /**
