@@ -10,7 +10,6 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { User } from 'src/auth/auth.decorator';
-import { AuthenticatedGuard } from 'src/auth/auth.guard';
 import { BoardKind } from 'src/entities/enums/boardKind';
 import { Users } from 'src/entities/Users';
 import { BoardsService } from './boards.service';
@@ -62,11 +61,10 @@ export class BoardsController {
   ) {
     return await this.boardsService.createBoard(createBoardDto, kind, user);
   }
-  
+
   /*
    * @url GET '/boards'
-   * @param offset 조회결과에 대한 pagination
-   * @param limit 조회결과에 대한 pagination
+   * @param page 조회할 페이지 번호
    * @description 유저 등급에 따라 전체 게시판을 조회하는 기능입니다.
    * @returns 게시판 조회 결과
    */
@@ -74,9 +72,9 @@ export class BoardsController {
   @Get('')
   async getAllBoards(
     @User() user: Users,
-    @Query('offset') offset: string,
-    @Query('limit') limit: string,
+    @Query('page', ParseIntPipe) page?: number,
+    @Query('pageSize', ParseIntPipe) pageSize?: number,
   ) {
-    return await this.boardsService.getAllBoards(user.rank, offset, limit);
+    return await this.boardsService.getAllBoards(user.rank, page, pageSize);
   }
 }

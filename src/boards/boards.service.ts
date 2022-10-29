@@ -91,13 +91,14 @@ export class BoardsService {
 
   /**
    * @param rank 유저 등급
-   * @param offset 기준 행
-   * @param limit 가져올 행 수
+   * @param page 페이지 번호
+   * @param pageSize 페이지 단위
    * @description 유저의 등급을 통해 게시판을 조회하고, 페이징합니다.
    * @returns 유저 게시판 조회 결과
    */
-  async getAllBoards(rank: UserRank, offset: string, limit: string) {
+  async getAllBoards(rank: UserRank, page?: number, pageSize?: number) {
     let kind;
+    const skip = page * pageSize;
 
     // 일반등급의 유저는 운영게시판에 대한 조회를 제외합니다.
     if (rank === UserRank.NORMAL) {
@@ -106,8 +107,8 @@ export class BoardsService {
 
     const board = await this.boardsRepository.find({
       where: { kind },
-      take: parseInt(limit),
-      skip: parseInt(offset),
+      skip: skip,
+      take: pageSize,
       order: { createdAt: 'DESC' },
     });
 
