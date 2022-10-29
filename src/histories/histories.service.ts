@@ -5,6 +5,7 @@ import { Histories } from '../entities/Histories';
 import { SearchHistoryByTimeDto } from './dto/search-historyByTime.dto';
 import { ResultHistoryByTimeDto } from './dto/result-historyByTime.dto';
 import { UserRank } from '../entities/enums/userRank';
+import { ResultStatisticsByGenderDto } from './dto/result-statistics-by-gender.dto';
 
 @Injectable()
 export class HistoriesService {
@@ -44,5 +45,20 @@ export class HistoriesService {
       .getRawMany();
 
     return { startDate, endDate, connectRecords };
+  }
+  /**
+   * 유저의 성별을 통계합니다.
+   * 유저의 성별은 유저 rank가 NORMAL유저만 통계합니다
+   * @returns NORMAL유저의 성별의 수를 보여 줍니다.
+   */
+  async getHistoriesByGender(): Promise<ResultStatisticsByGenderDto[]> {
+    return await this.historiesRepository
+      .createQueryBuilder('histories')
+      .leftJoin('histories.Connector', 'users')
+      .select(['users.gender AS gender'])
+      .addSelect('COUNT(*) AS genderCount')
+      .where('users.rank =:rank', { rank: UserRank.NORMAL })
+      .groupBy('users.gender')
+      .getRawMany();
   }
 }

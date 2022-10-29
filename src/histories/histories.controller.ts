@@ -2,6 +2,7 @@ import { Body, Controller, Get } from '@nestjs/common';
 import { HistoriesService } from './histories.service';
 import { SearchHistoryByTimeDto } from './dto/search-historyByTime.dto';
 import { ResultHistoryByTimeDto } from './dto/result-historyByTime.dto';
+import { ResultStatisticsByGenderDto } from './dto/result-statistics-by-gender.dto';
 
 @Controller('histories')
 export class HistoriesController {
@@ -20,5 +21,14 @@ export class HistoriesController {
     return this.historiesService.getHistoriesByConnectTime(
       searchHistoryByTimeDto,
     );
+  }
+  /**
+   * @url Get '/users/gender'
+   * @returns NORMAL유저의 성별의 수를 반환합니다.
+   */
+
+  @Get('gender')
+  async getHistoriesByGender(): Promise<ResultStatisticsByGenderDto[]> {
+    return await this.historiesService.getHistoriesByGender();
   }
 }
