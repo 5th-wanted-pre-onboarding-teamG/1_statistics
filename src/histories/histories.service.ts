@@ -47,7 +47,9 @@ export class HistoriesService {
     return { startDate, endDate, connectRecords };
   }
 
-  async getNowDateStatisticsFromUserAges() {
+  async getNowDateStatisticsFromUserAges(): Promise<
+    ResultStatisticsByAgeDto[]
+  > {
     const ageRecords = await this.historiesRepository
       .createQueryBuilder('histories')
       .leftJoin('histories.Connector', 'users')
@@ -63,17 +65,6 @@ export class HistoriesService {
       .addGroupBy("DATE_FORMAT(histories.connectTime, '%Y-%m-%d')")
       .getRawMany();
 
-    const resultRecords = await Promise.all(
-      ageRecords.map((r) => {
-        const newRecord = new ResultStatisticsByAgeDto(
-          r.connectDate,
-          r.age,
-          r.ageCount,
-        );
-        return newRecord;
-      }),
-    );
-
-    return resultRecords;
+    return ageRecords;
   }
 }
