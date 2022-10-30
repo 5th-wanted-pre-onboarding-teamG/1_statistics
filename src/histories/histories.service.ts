@@ -5,6 +5,7 @@ import { Histories } from '../entities/Histories';
 import { SearchHistoryByTimeDto } from './dto/search-historyByTime.dto';
 import { ResultHistoryByTimeDto } from './dto/result-historyByTime.dto';
 import { UserRank } from '../entities/enums/userRank';
+import { ResultStatisticsByAgeDto } from './dto/result-statistics-by-age.dto';
 
 @Injectable()
 export class HistoriesService {
@@ -44,5 +45,26 @@ export class HistoriesService {
       .getRawMany();
 
     return { startDate, endDate, connectRecords };
+  }
+
+  async getNowDateStatisticsFromUserAges(): Promise<
+    ResultStatisticsByAgeDto[]
+  > {
+    const ageRecords = await this.historiesRepository
+      .createQueryBuilder('histories')
+      .leftJoin('histories.Connector', 'users')
+      .select([
+        `DATE_FORMAT(histories.connectTime, '%Y-%m-%d') AS connectDate`,
+        'users.age AS age',
+        'COUNT(*) AS ageCount',
+      ])
+      .where(
+        `DATE_FORMAT(histories.connectTime, '%Y-%m-%d') = DATE_FORMAT(now(), '%Y-%m-%d')`,
+      )
+      .groupBy('users.age')
+      .addGroupBy("DATE_FORMAT(histories.connectTime, '%Y-%m-%d')")
+      .getRawMany();
+
+    return ageRecords;
   }
 }
