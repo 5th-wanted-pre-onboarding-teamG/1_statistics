@@ -2,6 +2,7 @@ import {
   Injectable,
   NotFoundException,
   ForbiddenException,
+  BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Boards } from '../entities/Boards';
@@ -10,6 +11,7 @@ import { CreateBoardDto } from './dto/create-board.dto';
 import { BoardKind } from 'src/entities/enums/boardKind';
 import { Users } from 'src/entities/Users';
 import { UserRank } from 'src/entities/enums/userRank';
+import { UpdateBoardDto } from './dto/update-board.dto';
 
 @Injectable()
 export class BoardsService {
@@ -89,5 +91,34 @@ export class BoardsService {
 
     // 게시글 삭제
     return this.boardsRepository.softDelete(boardId);
+  }
+
+  /**
+   * @param boardId 게시글 아이디
+   * @param user 수정요청 유저
+   * @returns 수정결과
+   */
+  async updateBoard(
+    boardId: number,
+    updateBoardDto: UpdateBoardDto,
+    user: Users,
+  ) {
+    // boardId에 해당하는 게시글이 로그인유저가 작성한 글인지 확인
+    const targetBoard = await this.boardsRepository
+      .createQueryBuilder('boards')
+      .leftJoin('boards.Author', 'users')
+      .where('boards.boardId = :boardId', { boardId })
+      .andWhere('users.userId = :userId', { userId: user.userId })
+      .getOne();
+
+    if (!targetBoard) {
+      throw new NotFoundException('해당 게시글은 존재하지 않습니다.');
+    }
+
+    // 수정
+    this.boardsRepository.save({
+      ...updateBoardDto,
+      boardId,
+    });
   }
 }
