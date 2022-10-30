@@ -2,6 +2,7 @@ import { Body, Controller, Get } from '@nestjs/common';
 import { HistoriesService } from './histories.service';
 import { SearchHistoryByTimeDto } from './dto/search-historyByTime.dto';
 import { ResultHistoryByTimeDto } from './dto/result-historyByTime.dto';
+import { ResultStatisticsByAgeDto } from './dto/result-statistics-by-age.dto';
 
 @Controller('histories')
 export class HistoriesController {
@@ -20,5 +21,16 @@ export class HistoriesController {
     return this.historiesService.getHistoriesByConnectTime(
       searchHistoryByTimeDto,
     );
+  }
+
+  /**
+   * @url GET '/histories/age
+   * @returns 금일 방문한 유저 나이기준으로 통계를 나타냅니다.
+   */
+  @Get('age')
+  async getNowDateStatisticsFromUserAges(): Promise<
+    ResultStatisticsByAgeDto[]
+  > {
+    return await this.historiesService.getNowDateStatisticsFromUserAges();
   }
 }
