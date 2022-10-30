@@ -11,7 +11,7 @@ export class UsersService {
   // 의존성 주입
   constructor(
     // 유저 레포지터리 주입
-    private datasource: DataSource,
+    private dataSource: DataSource,
     @InjectRepository(Users)
     private readonly usersRepsitory: Repository<Users>,
   ) {}
@@ -22,7 +22,7 @@ export class UsersService {
    * @returns 유저 회원가입 결과
    */
   async signUp(body: CreateUserDto) {
-    const queryRunner = this.datasource.createQueryRunner();
+    const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction();
     // 데이터베이스를 조회하여 이미 존재하는 유저인지 검사합니다.
@@ -37,7 +37,7 @@ export class UsersService {
     const hashedPassword = await bcrypt.hash(body.password, 12);
     try {
       // 데이터베이스에 저장합니다.
-      const result = await this.usersRepsitory.save({
+      const result = await queryRunner.manager.getRepository(Users).save({
         ...body,
         password: hashedPassword,
         age: +body.age,

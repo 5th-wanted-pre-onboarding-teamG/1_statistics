@@ -6,6 +6,7 @@ import { SearchHistoryByTimeDto } from './dto/search-historyByTime.dto';
 import { ResultHistoryByTimeDto } from './dto/result-historyByTime.dto';
 import { UserRank } from '../entities/enums/userRank';
 import { ResultStatisticsByGenderDto } from './dto/result-statistics-by-gender.dto';
+import { ResultStatisticsByAgeDto } from './dto/result-statistics-by-age.dto';
 
 @Injectable()
 export class HistoriesService {
@@ -46,6 +47,7 @@ export class HistoriesService {
 
     return { startDate, endDate, connectRecords };
   }
+
   /**
    * 유저의 성별을 통계합니다.
    * 유저의 성별은 유저 rank가 NORMAL유저만 통계합니다
@@ -60,5 +62,24 @@ export class HistoriesService {
       .where('users.rank =:rank', { rank: UserRank.NORMAL })
       .groupBy('users.gender')
       .getRawMany();
+  }
+
+  async getNowDateStatisticsFromUserAges(): Promise<ResultStatisticsByAgeDto[]> {
+    const ageRecords = await this.historiesRepository
+      .createQueryBuilder('histories')
+      .leftJoin('histories.Connector', 'users')
+      .select([
+        `DATE_FORMAT(histories.connectTime, '%Y-%m-%d') AS connectDate`,
+        'users.age AS age',
+        'COUNT(*) AS ageCount',
+      ])
+      .where(
+        `DATE_FORMAT(histories.connectTime, '%Y-%m-%d') = DATE_FORMAT(now(), '%Y-%m-%d')`,
+      )
+      .groupBy('users.age')
+      .addGroupBy("DATE_FORMAT(histories.connectTime, '%Y-%m-%d')")
+      .getRawMany();
+
+    return ageRecords;
   }
 }
