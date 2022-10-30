@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Boards } from '../entities/Boards';
-import { DeleteResult, Repository } from 'typeorm';
+import { Brackets, DataSource, DeleteResult, Repository } from 'typeorm';
 import { CreateBoardDto } from './dto/create-board.dto';
 import { BoardKind } from 'src/entities/enums/boardKind';
 import { Users } from 'src/entities/Users';
@@ -17,34 +17,55 @@ import { UpdateBoardDto } from './dto/update-board.dto';
 export class BoardsService {
   // 게시물 레포지터리를 주입합니다.
   constructor(
+    private dataSource: DataSource,
     @InjectRepository(Boards)
     private readonly boardsRepository: Repository<Boards>,
   ) {}
 
-  /**
-   * 종류에 따라 게시물을 조회합니다.
-   * @param kind 게시물 종류
-   * @returns 종류에 맞는 게시물을 객체 배열로 반환합니다.
-   */
-  async getBoardsByKind(kind: BoardKind) {
-    console.log(kind);
-    return await this.boardsRepository.find({
-      where: { kind },
-    });
+  async searchBoards(page = 1, kind?: BoardKind, name = '', keyword = '') {
+    const take = 30;
+
+    const queryBuilder = this.dataSource
+      .createQueryBuilder()
+      .select('boards')
+      .from(Boards, 'boards')
+      .leftJoinAndSelect('boards.Author', 'author')
+      .where('author.name LIKE :name', { name: `%${name}%` })
+      .andWhere(
+        new Brackets((qb) => {
+          qb.where('boards.title like :keyword', { keyword: `%${keyword}%` }),
+            qb.orWhere('boards.content like :keyword', {
+              keyword: `%${keyword}%`,
+            });
+        }),
+      )
+      .take(take)
+      .skip(take * (page - 1))
+      .orderBy('boards.createdAt', 'DESC');
+
+    if (kind) {
+      queryBuilder.andWhere('boards.kind = :kind', { kind });
+    }
+
+    return await queryBuilder.getMany();
   }
 
   /**
-   * 게시물 아이디로 특정 게시물을 조회합니다.
-   * @api GET /boards/:boardId
-   * @param boardId 게시물 아이디
-   * @returns 특정 게시물 아이디의 게시물 한 개를 반환합니다.
+   * 현재 사용자가 작성한 모든 게시물을 조회합니다.
+   * @api GET /boards/myBoards
+   * @param user 요청객체에 담긴 유저 정보
+   * @returns 내가 작성한 모든 게시물을 최신순으로 객체 배열로 반환합니다.
    */
-  async getSpecificBoard(boardId: number) {
-    // 게시물의 아이디는 고유한 값이므로 findOne을 사용했습니다.
-    return await this.boardsRepository.findOne({
-      where: { boardId },
-    });
+  async getAllMyBoards(userId: number) {
+    return await this.boardsRepository
+      .createQueryBuilder('boards')
+      .innerJoin('boards.Author', 'author', 'author.userId = :userId', {
+        userId,
+      })
+      .orderBy('boards.createdAt', 'DESC')
+      .getManyAndCount();
   }
+
   async createBoard(
     createBoardDto: CreateBoardDto,
     kind: BoardKind,
