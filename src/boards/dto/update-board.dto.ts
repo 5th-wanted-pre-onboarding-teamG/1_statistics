@@ -1,7 +1,6 @@
 import { IsNotEmpty, IsString } from 'class-validator';
-import { BoardKind } from '../../entities/enums/boardKind';
 
-export class CreateBoardDto {
+export class UpdateBoardDto {
   @IsNotEmpty()
   @IsString()
   title: string;
@@ -9,5 +8,4 @@ export class CreateBoardDto {
   @IsNotEmpty()
   @IsString()
   content: string;
-  kind: BoardKind;
 }

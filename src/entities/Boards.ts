@@ -1,4 +1,11 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  DeleteDateColumn,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { BoardKind } from './enums/boardKind';
 import { Users } from './Users';
 
@@ -16,12 +23,11 @@ export class Boards {
   @Column({ type: 'text', name: 'content' })
   content: string;
 
-  @Column({
-    type: 'timestamp',
-    name: 'createdAt',
-    default: () => 'CURRENT_TIMESTAMP',
-  })
+  @CreateDateColumn()
   createdAt: Date;
+
+  @DeleteDateColumn()
+  deletedAt: Date | null;
 
   @ManyToOne(() => Users, (users) => users.Boards)
   Author: Users;
