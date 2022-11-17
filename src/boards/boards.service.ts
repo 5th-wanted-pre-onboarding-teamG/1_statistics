@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Boards } from '../entities/Boards';
-import { Brackets, DataSource, DeleteResult, Repository } from 'typeorm';
+import { Brackets, DataSource, DeleteResult, Repository, Not } from 'typeorm';
 import { CreateBoardDto } from './dto/create-board.dto';
 import { BoardKind } from 'src/entities/enums/boardKind';
 import { Users } from 'src/entities/Users';
@@ -141,5 +141,24 @@ export class BoardsService {
       ...updateBoardDto,
       boardId,
     });
+
+  /**
+   * @param rank 유저 등급
+   * @param page 페이지 번호
+   * @param pageSize 페이지 단위
+   * @description 전체 게시판을 조회하고, 페이징합니다.
+   * @returns 공지사항을 포함한 전체 게시판 게시글(최신순)
+   */
+  async getAllBoards(rank: UserRank, page?: number, pageSize?: number) {
+    let kind;
+    const skip = page * pageSize;
+
+    const board = await this.boardsRepository
+      .createQueryBuilder('boards')
+      .where('kind != :kind', { kind: BoardKind.NOTICE })
+      .orderBy('createdAt', 'DESC')
+      .getMany();
+
+    return board;
   }
 }

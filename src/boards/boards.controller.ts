@@ -107,5 +107,20 @@ export class BoardsController {
     @Body() updateBoardDto?: UpdateBoardDto,
   ) {
     return await this.boardsService.updateBoard(boardId, updateBoardDto, user);
+
+  /**
+   * @url GET '/boards'
+   * @param page 조회할 페이지 번호
+   * @description 전체 게시판을 조회하는 기능입니다.
+   * @returns 공지사항을 포함한 전체 게시판 게시글(최신순)
+   */
+  @UseGuards(AuthenticatedGuard)
+  @Get('')
+  async getAllBoards(
+    @User() user: Users,
+    @Query('page', ParseIntPipe) page?: number,
+    @Query('pageSize', ParseIntPipe) pageSize?: number,
+  ) {
+    return await this.boardsService.getAllBoards(user.rank, page, pageSize);
   }
 }
